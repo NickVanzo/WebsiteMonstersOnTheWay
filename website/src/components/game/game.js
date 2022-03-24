@@ -1,15 +1,18 @@
 import Unity, { UnityContext } from "react-unity-webgl";
-import React, { useEffect } from "react";
-import { Container } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Container, Grid } from "@mui/material";
+import { Button } from "@mui/material";
 
 const unityContext = new UnityContext({
-    loaderUrl: "build0.1/Build/build0.1.loader.js",
-    dataUrl: "build0.1/Build/build0.1.data",
-    frameworkUrl: "build0.1/Build/build0.1.framework.js",
-    codeUrl: "build0.1/Build/build0.1.wasm",
+    loaderUrl: "test/Build/test.loader.js",
+    dataUrl: "test/Build/test.data",
+    frameworkUrl: "test/Build/test.framework.js",
+    codeUrl: "test/Build/test.wasm",
 });
 
 export function Game(props) {
+    let [startPressed, setStartPressed] = useState(false);
+
     useEffect(function () {
         unityContext.on("canvas", function (canvas) {
             canvas.width = 100;
@@ -21,13 +24,23 @@ export function Game(props) {
         unityContext.setFullscreen(true);
     }
 
-
     return (
-            <Container>
-                <button onClick={() => handleOnClickFullscreen()}>Fullscreen</button>
-                <Unity unityContext={unityContext}
-                    style={{ width: "800px", height: "500px" }}
-                />;
-            </Container>
+        <Grid container className={"home-page-container"}>
+            <Grid item xs={1} />
+            <Grid item xs={10}>
+                <h1>Play "Monsters on the way" to earn Crypto and NFTs</h1>
+                <h2>This is the project for my thesis</h2>
+                <p>
+                    Slay monsters and loot treasure to gain Crypto, NFTs and in game gold!<br />
+                    Use your gold or your tokens to buy NFTs directly from the market<br />
+                    That's all you need to understand, HAVE FUN!
+                </p>
+                <Button variant="contained" onClick={() => setStartPressed(true)}>
+                    <a href="https://allennick.itch.io/monsters-on-the-way">Open on itch.io</a>
+                </Button>
+            </Grid>
+            <Grid item xs={1} />
+        </Grid>
+
     )
 }

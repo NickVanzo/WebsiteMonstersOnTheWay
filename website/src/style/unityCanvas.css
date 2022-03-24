@@ -1,0 +1,6 @@
+.unityCanvas {
+    width: 100%;
+    height: 45em;
+    min-width: 800px;
+    position: relative;
+}

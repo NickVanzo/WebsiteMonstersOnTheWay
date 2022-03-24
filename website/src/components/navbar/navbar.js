@@ -7,13 +7,13 @@ export function HomeNavbar(props) {
     <>
       <Tabs id={'navbar'} className={'navbar'} centered>
         <Link to="/">
-          <Tab label="Play game" value={1}/>          
+          <Tab label="Play game"/>          
         </Link>
         <Link to="/marketplaceNFT">
-          <Tab label="NFTs" value={1}/>          
+          <Tab label="NFT"/>          
         </Link>
         <Link to="/marketplaceToken">
-          <Tab label="Tokens" value={1}/>          
+          <Tab label="Token"/>          
         </Link>
       </Tabs>      
     </>

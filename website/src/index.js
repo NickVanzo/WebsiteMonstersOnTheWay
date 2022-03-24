@@ -8,9 +8,13 @@ import {
 //Styles
 import './style/navbar.css';
 import './style/text.css';
+import './style/unityCanvas.css';
+import'./style/smallScreenUtils.css';
+import'./style/homepage.css';
+import'./style/buttons.css';
+
 
 import { App } from './app';
-
 import { NFTMarketPlace } from './components/marketplace/nft';
 import { TokenMarketPlace } from './components/marketplace/token';
 

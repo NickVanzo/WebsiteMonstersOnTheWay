@@ -1,0 +1,9 @@
+.home-page-container {    
+    top: 3em;
+    position: relative;
+    text-align: center;
+}
+
+body {
+    background-color: orange;
+}

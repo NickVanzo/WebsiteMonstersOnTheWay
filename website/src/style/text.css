@@ -1,0 +1,9 @@
+.home-page-container h1, h2, p {
+    text-align: center;
+    font-size: 25px;
+    color: rgb(0, 129, 204);
+}
+
+h1, h2, p {
+    font-family: Georgia, 'Times New Roman', Times, serif                                                 
+}
