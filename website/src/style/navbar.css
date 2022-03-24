@@ -1,0 +1,9 @@
+.navbar {
+    background-color: orange;
+    height: 6%;
+    position: fixed;
+    width: 100%;
+    left: 0%;
+    top: 0%;
+    min-width: 300px;    
+}
