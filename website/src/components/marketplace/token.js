@@ -10,6 +10,7 @@ import { Slide } from '@mui/material';
 import { Grid } from '@mui/material';
 import { Button, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { textAlign } from '@mui/system';
+import { CircularProgress } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -23,7 +24,9 @@ export class TokenMarketPlace extends React.Component {
             promethium: 0,
             gold: 0,
             active: false,
-            promethiumsToReceive: 0
+            promethiumsToReceive: 0,
+            address: '',
+            showProgress: false
         }
     }
 
@@ -40,24 +43,58 @@ export class TokenMarketPlace extends React.Component {
         })
     };
 
+    handleAccept = async () => {
+        if (typeof window.ethereum !== undefined) {
+            let query = await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/signMintOfTokens`, {
+                tokens: `${this.state.promethiumsToReceive * (10 ** 6)}`
+            });
+
+            let queryGold = await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/removeGold?address=${this.state.address}&gold=${this.state.gold}`)
+            console.log(queryGold.data);
+
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let signer = provider.getSigner();
+            let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, signer);
+            let trx = await contract.mint(`${query.data.signedMessage.message}`, `${query.data.signedMessage.signature}`);
+
+            this.setState({
+                showProgress: true
+            })
+
+            await provider.waitForTransaction(trx.hash);
+            window.location.reload();
+            this.setState({
+                open: false,
+                showProgress: false
+            })
+        }
+    }
+
     async componentDidMount() {
         if (typeof window.ethereum !== undefined) {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            this.setState({
+                address: accounts[0]
+            })
+
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let signer = provider.getSigner();
             let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, provider);
+
             contract.connect(signer);
+
             let decimals = await contract.decimals();
-            let balanceOf = await contract.balanceOf(accounts[0]);
+            let balanceOf = await contract.balanceOf(this.state.address);
+
             this.setState({
                 promethium: balanceOf.toNumber() / (10 ** decimals)
             })
-            this.fetchGoldOfPlayer(accounts[0]);
+            this.fetchGoldOfPlayer();
         }
     }
 
     async fetchGoldOfPlayer(account) {
-        let gold = await axios.get(`https://us-central1-dangermonsters.cloudfunctions.net/api/playerStats?address=${account}`);
+        let gold = await axios.get(`https://us-central1-dangermonsters.cloudfunctions.net/api/playerStats?address=${this.state.address}`);
         this.setState({
             gold: gold.data.gold
         })
@@ -80,22 +117,33 @@ export class TokenMarketPlace extends React.Component {
                                 <p>You will receive: {this.state.promethiumsToReceive} promethiums</p>
                             </DialogContentText>
                         </DialogContent>
-                        <DialogActions>
-                            <Grid container style={
-                                {textAlign: "center"}
-                            }>
-                                <Grid item xs={1}></Grid>
-                                <Grid item xs={4}>
-                                    <button className='personal-button-deny' onClick={this.handleClose}>Disagree</button>
-                                </Grid>
-                                <Grid item xs={2}></Grid>
-                                <Grid item xs={4}>
-                                    <button className='personal-button-accept' onClick={this.handleClose}>Agree</button>
-                                </Grid>
-                                <Grid item xs={1}></Grid>
-                            </Grid>
+                        {
+                            !this.state.showProgress ?
+                                <DialogActions>
+                                    <Grid container style={
+                                        { textAlign: "center" }
+                                    }>
+                                        <Grid item xs={1}></Grid>
+                                        <Grid item xs={4}>
+                                            <button className='personal-button-deny' onClick={this.handleClose}>Disagree</button>
+                                        </Grid>
+                                        <Grid item xs={2}></Grid>
+                                        <Grid item xs={4}>
+                                            <button className='personal-button-accept' onClick={this.handleAccept}>Agree</button>
+                                        </Grid>
+                                        <Grid item xs={1}></Grid>
+                                    </Grid>
 
-                        </DialogActions>
+                                </DialogActions>
+                                :
+                                <DialogActions>
+                                    <Grid container style={{ textAlign: "center" }}>
+                                        <Grid item xs={12}>
+                                            <CircularProgress />
+                                        </Grid>
+                                    </Grid>
+                                </DialogActions>
+                        }
                     </Dialog>
                 </div>
                 <Container className='home-page-container'>
