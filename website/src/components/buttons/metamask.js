@@ -16,6 +16,7 @@ export class MetamaskButton extends React.Component {
             this.setState({
                 address: accounts[0]
             })
+            this.props.callbackFunction(accounts[0]);
             document.getElementById('metamask-button').style.visibility = "hidden";
         } else {
             const onboarding = new MetaMaskOnboarding();

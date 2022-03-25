@@ -8,8 +8,7 @@ import axios from 'axios';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Slide } from '@mui/material';
 import { Grid } from '@mui/material';
-import { Button, Dialog, DialogTitle, DialogActions, DialogContent, DialogContentText } from '@mui/material';
-import { textAlign } from '@mui/system';
+import { Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -26,7 +25,7 @@ export class TokenMarketPlace extends React.Component {
             active: false,
             promethiumsToReceive: 0,
             address: '',
-            showProgress: false
+            showProgress: false,            
         }
     }
 
@@ -68,17 +67,23 @@ export class TokenMarketPlace extends React.Component {
                 showProgress: false
             })
         }
+    }    
+
+    handleSetAddress = (addressToSet) => {
+        this.setState({
+            address: addressToSet
+        })
     }
 
     async componentDidMount() {
         if (typeof window.ethereum !== undefined) {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let signer = provider.getSigner();
+            const accounts = await provider.send("eth_requestAccounts", []);
             this.setState({
                 address: accounts[0]
             })
-
-            let provider = new ethers.providers.Web3Provider(window.ethereum);
-            let signer = provider.getSigner();
+            console.log(this.state.address)
             let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, provider);
 
             contract.connect(signer);
@@ -146,13 +151,13 @@ export class TokenMarketPlace extends React.Component {
                         }
                     </Dialog>
                 </div>
-                <Container className='home-page-container'>
+                <Container className='token-page-container'>
                     <p>Promethium balance: {this.state.promethium}</p>
                     <p>Gold balance: {this.state.gold}</p>
-                    <p>Convert your gold to promethium! <br />For every 100 coins you will get 1 promethium</p>
+                    <p>Convert your gold coins to promethium! <br />For every 100 coins you will get 1 promethium</p>
                     <button onClick={this.handleClickOpen} className='personal-button'><AutorenewIcon fontSize='large'></AutorenewIcon></button>
                 </Container>
-                <MetamaskButton />
+                <MetamaskButton callbackFunction={this.handleSetAddress}/>
             </>
         )
     }

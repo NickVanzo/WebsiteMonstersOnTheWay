@@ -1,0 +1,13 @@
+@media screen and (min-width: 0px) and (max-width: 500px) {
+    .token-page-container {    
+        top: 3em;
+        position: relative;
+        text-align: center;
+    }   
+}
+
+.token-page-container {    
+    top: 15em;
+    position: relative;
+    text-align: center;
+}

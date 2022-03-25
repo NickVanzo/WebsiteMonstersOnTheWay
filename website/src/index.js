@@ -13,7 +13,7 @@ import'./style/smallScreenUtils.css';
 import'./style/homepage.css';
 import'./style/buttons.css';
 import './style/personalFonts.css';
-
+import './style/token-page.css';
 import { App } from './app';
 import { NFTMarketPlace } from './components/marketplace/nft';
 import { TokenMarketPlace } from './components/marketplace/token';
