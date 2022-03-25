@@ -1,29 +1,9 @@
-import Unity, { UnityContext } from "react-unity-webgl";
-import React, { useEffect, useState } from "react";
-import { Container, Grid } from "@mui/material";
+import React from "react";
+import { Grid } from "@mui/material";
 import { Button } from "@mui/material";
 
-const unityContext = new UnityContext({
-    loaderUrl: "test/Build/test.loader.js",
-    dataUrl: "test/Build/test.data",
-    frameworkUrl: "test/Build/test.framework.js",
-    codeUrl: "test/Build/test.wasm",
-});
 
 export function Game(props) {
-    let [startPressed, setStartPressed] = useState(false);
-
-    useEffect(function () {
-        unityContext.on("canvas", function (canvas) {
-            canvas.width = 100;
-            canvas.height = 50;
-        });
-    }, []);
-
-    function handleOnClickFullscreen() {
-        unityContext.setFullscreen(true);
-    }
-
     return (
         <Grid container className={"home-page-container"}>
             <Grid item xs={1} />
@@ -35,7 +15,7 @@ export function Game(props) {
                     Use your gold or your tokens to buy NFTs directly from the market<br />
                     That's all you need to understand, HAVE FUN!
                 </p>
-                <Button variant="contained" onClick={() => setStartPressed(true)}>
+                <Button variant="contained">
                     <a href="https://allennick.itch.io/monsters-on-the-way">Open on itch.io</a>
                 </Button>
             </Grid>

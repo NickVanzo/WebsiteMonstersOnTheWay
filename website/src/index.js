@@ -12,11 +12,12 @@ import './style/unityCanvas.css';
 import'./style/smallScreenUtils.css';
 import'./style/homepage.css';
 import'./style/buttons.css';
-
+import './style/personalFonts.css';
 
 import { App } from './app';
 import { NFTMarketPlace } from './components/marketplace/nft';
 import { TokenMarketPlace } from './components/marketplace/token';
+
 
 ReactDOM.render(
   <React.StrictMode>

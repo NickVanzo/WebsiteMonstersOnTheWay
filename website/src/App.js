@@ -5,7 +5,7 @@ import { MetamaskButton } from './components/buttons/metamask';
 export function App(props) {
     return (
         <>
-            <HomeNavbar />
+            <HomeNavbar tabSelected={0}/>
             <Game />
             <MetamaskButton/>
         </>

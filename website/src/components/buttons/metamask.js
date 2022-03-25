@@ -1,9 +1,7 @@
 import { Button } from "@mui/material"
 import { Tooltip } from "@mui/material";
 import MetaMaskOnboarding from '@metamask/onboarding';
-import React, { useEffect } from "react";
-import { useState } from "react";
-
+import React from "react";
 export class MetamaskButton extends React.Component {
     constructor(props) {
         super(props);
@@ -26,10 +24,9 @@ export class MetamaskButton extends React.Component {
     }
     render() {
         return (
-            <Tooltip id="metamask-button-container" placement="top" arrow >
+            <Tooltip id="metamask-button-container" title={"Metamask"} placement="top" arrow >
                 <Button variant="contained"
                     id={"metamask-button"}
-                    title={'Connect Metamask'}
                     onClick={async () => await this.connectMetamask()}
                 >
                     <img src="./images/metamask-fox.svg" />
