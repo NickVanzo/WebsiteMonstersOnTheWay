@@ -5,7 +5,19 @@
 }
 
 .nft-owned-list {
-    width: 100%;
+    width:100%;
     background-color: rgb(255, 147, 6);
     border-radius: 30px;
+}
+
+.nft-img {
+    max-width: 300px;
+    border-radius: 30px;
+}
+
+@media screen and (max-width: 500px) {
+    .nft-img {
+        max-width: 200px;
+        
+    }   
 }

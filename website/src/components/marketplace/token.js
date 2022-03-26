@@ -83,7 +83,6 @@ export class TokenMarketPlace extends React.Component {
             this.setState({
                 address: accounts[0]
             })
-            console.log(this.state.address)
             let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, provider);
 
             contract.connect(signer);
