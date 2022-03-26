@@ -8,3 +8,20 @@ h1, h2, p {
     font-family: "Personal Chicago"                                             
 }
 
+.text-personal {
+    font-family: "Personal Chicago"                                             
+}
+
+.nft-owned-list p {
+    font-size: 20px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+@media screen and (max-width: 400px) {
+    .nft-owned-list .hide-on-small-screen {
+        font-size: 20px;
+        text-align: left;
+        display: none;
+    }   
+}

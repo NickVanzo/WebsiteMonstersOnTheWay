@@ -1,0 +1,11 @@
+.nft-page-container {    
+    top: 3em;
+    position: relative;
+    text-align: center;
+}
+
+.nft-owned-list {
+    width: 100%;
+    background-color: rgb(255, 147, 6);
+    border-radius: 30px;
+}
