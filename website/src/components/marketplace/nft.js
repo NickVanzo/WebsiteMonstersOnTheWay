@@ -7,7 +7,8 @@ import { InteractiveList } from './personalCollection';
 import { Container } from 'react-bootstrap';
 import axios from 'axios';
 import { create } from "ipfs";
-import { MintNFT } from './mintNFT';
+import { Grid } from '@mui/material';
+import { MintNFT } from './mintPage';
 
 export class NFTMarketPlace extends React.Component {
     constructor(props) {
@@ -16,6 +17,7 @@ export class NFTMarketPlace extends React.Component {
             idOfNFTsOwned: [],
             address: '',
             ipfs: undefined,
+            sectionToRender: 1
         }
     }
 
@@ -64,7 +66,7 @@ export class NFTMarketPlace extends React.Component {
                 let cardData = await this.fetchDataForCard(uriOfJson);
                 cardInfo.id = i;
                 cardInfo.effects = cardData
-                cardInfo.imageUrl = `https://ipfs.io/ipfs/${cardData["image"].slice(7,cardData["image"].length)}`;
+                cardInfo.imageUrl = `https://ipfs.io/ipfs/${cardData["image"].slice(7, cardData["image"].length)}`;
                 this.setState({
                     idOfNFTsOwned: this.state.idOfNFTsOwned.concat(cardInfo)
                 })
@@ -103,14 +105,31 @@ export class NFTMarketPlace extends React.Component {
             <>
                 <HomeNavbar tabSelected={1} />
                 <Container className={'nft-page-container'}>
-                    <h1>Mint an NFT</h1>
-                    <MintNFT/>
-                    <p>Connect Metamask to see your NFTs</p>
+                    <Grid container>
+                        <Grid item xs={2}></Grid>
+                        <Grid item xs={4} style={{ textAlign: "right" }}>
+                            <button className='button-choose-section' onClick={() => this.setState({ sectionToRender: 0 })}>My collection</button>
+                        </Grid>
+                        <Grid item xs={4} style={{ textAlign: "left" }}>
+                            <button className='button-choose-section' onClick={() => this.setState({ sectionToRender: 1 })}>Shop</button>
+                        </Grid>
+                        <Grid item xs={2}></Grid>
+                    </Grid>
                     {
-                        this.state.idOfNFTsOwned.length > 0 && (
-                            <InteractiveList ids={this.state.idOfNFTsOwned} ipfs={this.state.ipfs} />
-                        )
+                        this.state.sectionToRender === 0 ? (
+                            <>
+                                <h1>Connect Metamask to see your NFTs</h1>
+                                {
+                                    this.state.idOfNFTsOwned.length > 0 && (
+                                        <InteractiveList ids={this.state.idOfNFTsOwned} ipfs={this.state.ipfs} />
+                                    )
+                                }
+                            </>
+                        ) : <>
+                            <MintNFT/>
+                        </>
                     }
+
                 </Container>
                 <MetamaskButton callbackFunction={this.handleSetAddress} />
             </>

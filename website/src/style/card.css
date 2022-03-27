@@ -1,4 +1,17 @@
-.random-card {
-    color: red;
-    
+.card {
+    left: 38%;
+    position: relative;
+    width: 100%;
+    margin-bottom: 10em;
+    max-width: 345px;
+    max-height: 700px;
 }
+
+@media screen and (min-width: 0px) and (max-width: 400px) {
+    .card {
+        left: 0%;
+    }
+}
+
+
+
