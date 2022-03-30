@@ -7,7 +7,6 @@ import { ethers } from 'ethers';
 import { constants } from '../../constants';
 import { CircularProgress } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import axios from 'axios';
 
 export default class NFTCard extends React.Component {
     constructor(props) {
@@ -31,14 +30,16 @@ export default class NFTCard extends React.Component {
         })
     }
 
-    connectToSmartContract = () => {
+    connectToSmartContract = async () => {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
         let signer = provider.getSigner();
         let contract = new ethers.Contract(constants.contractNFTAddress, constants.contractNFTABI, signer);
+        let address = await signer.getAddress()
+        console.log(address);
         return {
             contract: contract,
             provider: provider,
-            address: signer.getAddress()
+            address: address
         };
     }
 
@@ -74,7 +75,7 @@ export default class NFTCard extends React.Component {
     }
 
     handleMintWithPromethium = async () => {
-        let blockchain = this.connectToSmartContract();
+        let blockchain = await this.connectToSmartContract();
         let uri = this.generateRandomURI();
         let card = {
             id: uri.id,
@@ -84,7 +85,7 @@ export default class NFTCard extends React.Component {
         this.setState({
             cardMinted: card
         })
-        let trx = await blockchain.contract.safeMintWithTokens(`${uri.uri}`);
+        let trx = await blockchain.contract.safeMintWithTokens(`${blockchain.address}`, `${uri.uri}`);
         this.setState({
             processingIndexing: true
         })
@@ -98,7 +99,7 @@ export default class NFTCard extends React.Component {
     }
 
     handleMintWithETH = async () => {
-        let blockchain = this.connectToSmartContract();
+        let blockchain = await this.connectToSmartContract();
         const fee = await this.fetchFee(blockchain);
         let uri = this.generateRandomURI();
         const options = {
@@ -112,7 +113,8 @@ export default class NFTCard extends React.Component {
         this.setState({
             cardMinted: card
         })
-        const trx = await blockchain.contract.safeMint(`${uri.uri}`, options);
+        console.log(blockchain, uri, options);
+        const trx = await blockchain.contract.safeMint(`${blockchain.address}`,`${uri.uri}`, options);
         this.setState({
             processingIndexing: true
         })

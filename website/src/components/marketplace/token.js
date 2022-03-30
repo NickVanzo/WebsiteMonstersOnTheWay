@@ -54,6 +54,7 @@ export class TokenMarketPlace extends React.Component {
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let signer = provider.getSigner();
             let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, signer);
+            console.log(query.data)
             let trx = await contract.mint(`${query.data.signedMessage.message}`, `${query.data.signedMessage.signature}`);
 
             this.setState({
@@ -89,7 +90,6 @@ export class TokenMarketPlace extends React.Component {
 
             let decimals = await contract.decimals();
             let balanceOf = await contract.balanceOf(this.state.address);
-
             this.setState({
                 promethium: balanceOf.toNumber() / (10 ** decimals)
             })
