@@ -75,57 +75,68 @@ export default class NFTCard extends React.Component {
     }
 
     handleMintWithPromethium = async () => {
-        let blockchain = await this.connectToSmartContract();
-        let uri = this.generateRandomURI();
-        let card = {
-            id: uri.id,
-            name: this.nameOfCard(uri.id),
-            uri: uri.uri
+        if (typeof window.ethereum !== undefined) {
+            let blockchain = await this.connectToSmartContract();
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let signer = provider.getSigner();
+            const accounts = await provider.send("eth_requestAccounts", []);
+            let uri = this.generateRandomURI();
+            let card = {
+                id: uri.id,
+                name: this.nameOfCard(uri.id),
+                uri: uri.uri
+            }
+            this.setState({
+                cardMinted: card
+            })
+            let trx = await blockchain.contract.safeMintWithTokens(`${blockchain.address}`, `${uri.uri}`);
+            this.setState({
+                processingIndexing: true
+            })
+            let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+            card.hash = receipt.transactionHash
+            let img = this.getImgFromName(card.name);
+            this.setState({
+                processingEnded: true,
+                srcOfImgToDisplay: img
+            })
         }
-        this.setState({
-            cardMinted: card
-        })
-        let trx = await blockchain.contract.safeMintWithTokens(`${blockchain.address}`, `${uri.uri}`);
-        this.setState({
-            processingIndexing: true
-        })
-        let receipt = await blockchain.provider.waitForTransaction(trx.hash);
-        card.hash = receipt.transactionHash
-        let img = this.getImgFromName(card.name);
-        this.setState({
-            processingEnded: true,
-            srcOfImgToDisplay: img
-        })
+
     }
 
     handleMintWithETH = async () => {
-        let blockchain = await this.connectToSmartContract();
-        const fee = await this.fetchFee(blockchain);
-        let uri = this.generateRandomURI();
-        const options = {
-            value: ethers.utils.parseEther(`${fee}`)
-        }
-        let card = {
-            id: uri.id,
-            name: this.nameOfCard(uri.id),
-            uri: uri.uri
-        }
-        this.setState({
-            cardMinted: card
-        })
-        console.log(blockchain, uri, options);
-        const trx = await blockchain.contract.safeMint(`${blockchain.address}`,`${uri.uri}`, options);
-        this.setState({
-            processingIndexing: true
-        })
-        let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+        if (typeof window.ethereum !== undefined) {
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let signer = provider.getSigner();
+            const accounts = await provider.send("eth_requestAccounts", []);
+            let blockchain = await this.connectToSmartContract();
+            const fee = await this.fetchFee(blockchain);
+            let uri = this.generateRandomURI();
+            const options = {
+                value: ethers.utils.parseEther(`${fee}`)
+            }
+            let card = {
+                id: uri.id,
+                name: this.nameOfCard(uri.id),
+                uri: uri.uri
+            }
+            this.setState({
+                cardMinted: card
+            })
 
-        card.hash = receipt.transactionHash
-        let img = this.getImgFromName(card.name);
-        this.setState({
-            processingEnded: true,
-            srcOfImgToDisplay: img
-        })
+            const trx = await blockchain.contract.safeMint(`${blockchain.address}`, `${uri.uri}`, options);
+            this.setState({
+                processingIndexing: true
+            })
+            let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+
+            card.hash = receipt.transactionHash
+            let img = this.getImgFromName(card.name);
+            this.setState({
+                processingEnded: true,
+                srcOfImgToDisplay: img
+            })
+        }
     }
 
     nameOfCard = (id) => {
@@ -246,7 +257,7 @@ export default class NFTCard extends React.Component {
                                             {this.state.cardMinted.name} added to your collection!
                                         </p>
                                         <CheckIcon style={{ color: "green" }} />
-                                    <button className='personal-button-accept' onClick={this.handleDoneButton}>Done</button>
+                                        <button className='personal-button-accept' onClick={this.handleDoneButton}>Done</button>
                                     </>
                                 )
                             )
