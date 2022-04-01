@@ -17,12 +17,15 @@
     font-family: "Personal Chicago";
     text-align: center;
     cursor: pointer;
+    border: black;
+    border-style: solid;    
 }
 
 .personal-button:hover, .personal-button-deny:hover {
     background-color: red;
     color: white;
 }
+
 
 .personal-button-accept {
     width: 100%;
@@ -97,6 +100,10 @@
 .personal-button-opensea:hover {
     background-color: rgba(0, 217, 255, 0.87);
     color: white;
+}
+
+.button-game {
+    background-color:white;
 }
 
 .button-choose-section {
