@@ -3,10 +3,11 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { constants } from '../../constants';
-import { CircularProgress } from '@mui/material';
+import { Alert, CircularProgress } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
+import $ from "jquery";
 
 export default class NFTCard extends React.Component {
     constructor(props) {
@@ -17,17 +18,21 @@ export default class NFTCard extends React.Component {
             feeETH: 0,
             processingIndexing: false,
             processingEnded: false,
-            cardMinted: {}
+            cardMinted: {},
+            messageAlert: "",
         }
     }
 
     async componentDidMount() {
+        $("#alert-mint-process-fail").hide();
+        $("#alert-mint-process-success").hide()
         this.changeImageOverTime();
         let contract = this.connectToSmartContract();
-        let fee = await this.fetchFee(contract);
+        let fee = await this.fetchFee(contract.contract);
         this.setState({
             feeETH: fee
         })
+        ;
     }
 
     connectToSmartContract = async () => {
@@ -35,7 +40,6 @@ export default class NFTCard extends React.Component {
         let signer = provider.getSigner();
         let contract = new ethers.Contract(constants.contractNFTAddress, constants.contractNFTABI, signer);
         let address = await signer.getAddress()
-        console.log(address);
         return {
             contract: contract,
             provider: provider,
@@ -70,12 +74,9 @@ export default class NFTCard extends React.Component {
         };
     }
 
-    mintCard = () => {
-
-    }
-
     handleMintWithPromethium = async () => {
         if (typeof window.ethereum !== undefined) {
+            
             let blockchain = await this.connectToSmartContract();
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let signer = provider.getSigner();
@@ -89,19 +90,32 @@ export default class NFTCard extends React.Component {
             this.setState({
                 cardMinted: card
             })
-            let trx = await blockchain.contract.safeMintWithTokens(`${blockchain.address}`, `${uri.uri}`);
-            this.setState({
-                processingIndexing: true
-            })
-            let receipt = await blockchain.provider.waitForTransaction(trx.hash);
-            card.hash = receipt.transactionHash
-            let img = this.getImgFromName(card.name);
-            this.setState({
-                processingEnded: true,
-                srcOfImgToDisplay: img
-            })
+            if(await this.userHasEnoughPromethium(blockchain, 10)) {
+                let trx = await blockchain.contract.safeMintWithTokens(`${blockchain.address}`, `${uri.uri}`);
+                this.setState({
+                    processingIndexing: true
+                })
+                let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+                card.hash = receipt.transactionHash
+                let img = this.getImgFromName(card.name);
+                this.setState({
+                    processingEnded: true,
+                    srcOfImgToDisplay: img
+                })    
+                $("#alert-mint-process-success").show();
+                this.setState({
+                    messageAlert: 'Purchase successful'
+                })
+                this.hideAlertOfSuccess();
+            } else {
+                $("#alert-mint-process-fail").show();
+                this.setState({
+                    messageAlert: 'You don\'t have enough Promethium'
+                })
+                this.hideAlertError();
+            }
+            
         }
-
     }
 
     handleMintWithETH = async () => {
@@ -123,20 +137,67 @@ export default class NFTCard extends React.Component {
             this.setState({
                 cardMinted: card
             })
+            if (this.userHasEnoughEth(blockchain, fee)) {
+                const trx = await blockchain.contract.safeMint(`${blockchain.address}`, `${uri.uri}`, options);
+                this.setState({
+                    processingIndexing: true
+                })
+                let receipt = await blockchain.provider.waitForTransaction(trx.hash);
 
-            const trx = await blockchain.contract.safeMint(`${blockchain.address}`, `${uri.uri}`, options);
-            this.setState({
-                processingIndexing: true
-            })
-            let receipt = await blockchain.provider.waitForTransaction(trx.hash);
-
-            card.hash = receipt.transactionHash
-            let img = this.getImgFromName(card.name);
-            this.setState({
-                processingEnded: true,
-                srcOfImgToDisplay: img
-            })
+                card.hash = receipt.transactionHash
+                let img = this.getImgFromName(card.name);
+                this.setState({
+                    processingEnded: true,
+                    srcOfImgToDisplay: img,
+                    messageAlert: 'Mint successful'
+                })
+                $("#alert-mint-process-success").show();
+                this.setState({
+                    messageAlert: 'Purchase successful'
+                })
+                this.hideAlertOfSuccess();
+            } else {
+                $("#alert-mint-process-fail").show();
+                this.setState({
+                    messageAlert: 'You don\'t have enough ETH'
+                })
+                this.hideAlertOfError();
+            }
         }
+    }
+
+    hideAlertError = () => {
+        setTimeout(() => {
+            $("#alert-mint-process-fail").hide();
+            this.setState({
+                messageAlert: ""
+            });
+        }, 3000)
+    }
+
+    hideAlertOfSuccess = () => {
+        setTimeout(() => {
+            $("#alert-mint-process-success").hide();
+            this.setState({
+                messageAlert: ""
+            });
+        }, 3000)
+    }
+
+    userHasEnoughEth = async (blockchain, fee) => {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        const balance = await provider.getBalance(blockchain.address);
+        const balanceInEth = ethers.utils.formatEther(balance._hex).toString();
+        return balanceInEth >= fee ? true : false
+    }
+
+    userHasEnoughPromethium = async (blockchain, fee) => {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let signer = provider.getSigner();
+        let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, signer);
+        let address = await signer.getAddress()
+        const balance = await contract.balanceOf(address);
+        return balance.toNumber() >= fee ? true : false
     }
 
     nameOfCard = (id) => {
@@ -156,7 +217,10 @@ export default class NFTCard extends React.Component {
     }
 
     fetchFee = async (blockchain) => {
-        const feeBN = await blockchain.contract.getFee();
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let contract = new ethers.Contract(constants.contractNFTAddress, constants.contractNFTABI, provider);
+        const feeBN = await contract.getFee();
+        console.log(feeBN);
         return ethers.utils.formatEther(feeBN._hex).toString();
     }
 
@@ -226,6 +290,12 @@ export default class NFTCard extends React.Component {
     render() {
         return (
             <>
+                <Alert variant="filled" severity="success" id="alert-mint-process-success" style={{ zIndex: 2, position: "fixed", top: "10px" }}>
+                    {this.state.messageAlert}
+                </Alert>
+                <Alert variant="filled" severity="error" id="alert-mint-process-fail" style={{ zIndex: 2, position: "fixed", top: "10px" }}>
+                    {this.state.messageAlert}
+                </Alert>
                 <Card className='card ' sx={{ borderRadius: "30px", backgroundColor: "#000000" }} >
                     <CardMedia
                         component="img"
