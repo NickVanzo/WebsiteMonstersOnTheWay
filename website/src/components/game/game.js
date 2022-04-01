@@ -24,6 +24,9 @@ export class Game extends React.Component {
         });
         setTimeout(() => {
             $("#alert-game").hide();
+            this.setState({
+                alertMessage: ""
+            })
         }, 3000);
     }
 

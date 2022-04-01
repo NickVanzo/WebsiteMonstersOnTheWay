@@ -4,9 +4,6 @@ import NFTCard from "./nftcard";
 export class MintNFT extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-
-        }
     }
 
     render() {

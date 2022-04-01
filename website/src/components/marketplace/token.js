@@ -3,18 +3,18 @@ import { MetamaskButton } from '../buttons/metamask';
 import React from "react";
 import { ethers } from 'ethers';
 import { constants } from '../../constants';
-import { Container } from '@mui/material';
+import { Alert, Container, Slider } from '@mui/material';
 import axios from 'axios';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Slide } from '@mui/material';
 import { Grid } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { CircularProgress } from '@mui/material';
+import $ from "jquery";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-
 
 export class TokenMarketPlace extends React.Component {
     constructor(props) {
@@ -22,11 +22,30 @@ export class TokenMarketPlace extends React.Component {
         this.state = {
             promethium: 0,
             gold: 0,
+            goldAvailable: 0,
             active: false,
             promethiumsToReceive: 0,
-            address: '',
-            showProgress: false,            
+            address: "",
+            showProgress: false,
         }
+    }
+
+    hideAlertError = () => {
+        setTimeout(() => {
+            $("#alert-mint-process-fail").hide();
+            this.setState({
+                messageAlert: ""
+            });
+        }, 3000)
+    }
+
+    hideAlertOfSuccess = () => {
+        setTimeout(() => {
+            $("#alert-mint-process-success").hide();
+            this.setState({
+                messageAlert: ""
+            });
+        }, 3000)
     }
 
     handleClickOpen = () => {
@@ -48,13 +67,11 @@ export class TokenMarketPlace extends React.Component {
                 tokens: `${this.state.promethiumsToReceive * (10 ** 6)}`
             });
 
-            let queryGold = await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/removeGold?address=${this.state.address}&gold=${this.state.gold}`)
-            console.log(queryGold.data);
+            await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/removeGold?address=${this.state.address}&gold=${this.state.gold}`)
 
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let signer = provider.getSigner();
             let contract = new ethers.Contract(constants.contractAddress, constants.contractABI, signer);
-            console.log(query.data)
             let trx = await contract.mint(`${query.data.signedMessage.message}`, `${query.data.signedMessage.signature}`);
 
             this.setState({
@@ -65,10 +82,10 @@ export class TokenMarketPlace extends React.Component {
             window.location.reload();
             this.setState({
                 open: false,
-                showProgress: false
+                showProgress: false,
             })
         }
-    }    
+    }
 
     handleSetAddress = (addressToSet) => {
         this.setState({
@@ -100,7 +117,16 @@ export class TokenMarketPlace extends React.Component {
     async fetchGoldOfPlayer(account) {
         let gold = await axios.get(`https://us-central1-dangermonsters.cloudfunctions.net/api/playerStats?address=${this.state.address}`);
         this.setState({
-            gold: gold.data.gold
+            gold: gold.data.gold,
+            goldAvailable: gold.data.gold
+        })
+        $("#slider-gold").val(this.state.gold);
+    }
+
+    handleChange = (event, newValue) => {
+        this.setState({
+            gold: newValue,
+            promethiumsToReceive: newValue / 100
         })
     }
 
@@ -118,8 +144,20 @@ export class TokenMarketPlace extends React.Component {
                     >
                         <DialogContent>
                             <DialogContentText id="alert-dialog-slide-description">
+                                <p>You spend: {this.state.gold}</p>
                                 <p>You will receive: {this.state.promethiumsToReceive} promethiums</p>
                             </DialogContentText>
+                            <Slider
+                                style={{ maxWidth: 500 }}
+                                value={this.state.gold}
+                                min={0}
+                                max={this.state.goldAvailable}
+                                step={1}
+                                onChange={this.handleChange}
+                                valueLabelDisplay="auto"
+                                aria-labelledby="non-linear-slider"
+                                id="slider-gold"
+                            />
                         </DialogContent>
                         {
                             !this.state.showProgress ?
@@ -156,7 +194,7 @@ export class TokenMarketPlace extends React.Component {
                     <p>Convert your gold coins to promethium! <br />For every 100 coins you will get 1 promethium</p>
                     <button onClick={this.handleClickOpen} className='personal-button'><AutorenewIcon fontSize='large'></AutorenewIcon></button>
                 </Container>
-                <MetamaskButton callbackFunction={this.handleSetAddress}/>
+                <MetamaskButton callbackFunction={this.handleSetAddress} />
             </>
         )
     }
