@@ -3,7 +3,7 @@ import { MetamaskButton } from '../buttons/metamask';
 import React from "react";
 import { ethers } from 'ethers';
 import { constants } from '../../constants';
-import { Alert, Container, Slider } from '@mui/material';
+import { Container, Slider } from '@mui/material';
 import axios from 'axios';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Slide } from '@mui/material';

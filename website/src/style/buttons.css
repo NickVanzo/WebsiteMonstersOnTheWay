@@ -53,7 +53,7 @@
     font-size: large;
 }
 
-.personal-button-mint-gold {
+.personal-button-mint-ticket {
     width: 76%;
     border-radius: 10px;
     font-family: "Personal Chicago";
@@ -61,6 +61,8 @@
     cursor: pointer;
     height: 79px;
     font-size: large;
+    max-width: 200px;
+    margin-left: 10px;
 }
 
 .personal-button-mint-eth {
@@ -74,7 +76,7 @@
     font-size: large;
 }
 
-.personal-button-mint-gold:hover {
+.personal-button-mint-ticket:hover {
     background-color: gold;
     color: white;
 }
@@ -149,3 +151,4 @@
 .card-close-button {
     background-color: transparent;
 }
+

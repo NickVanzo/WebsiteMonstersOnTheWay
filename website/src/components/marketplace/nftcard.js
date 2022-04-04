@@ -8,6 +8,7 @@ import { constants } from '../../constants';
 import { Alert, CircularProgress } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import $ from "jquery";
+import axios from 'axios';
 
 export default class NFTCard extends React.Component {
     constructor(props) {
@@ -20,6 +21,9 @@ export default class NFTCard extends React.Component {
             processingEnded: false,
             cardMinted: {},
             messageAlert: "",
+            commonTickets: 0,
+            rareTickets: 0,
+            veryRareTickets: 0
         }
     }
 
@@ -31,8 +35,21 @@ export default class NFTCard extends React.Component {
         let fee = await this.fetchFee(contract.contract);
         this.setState({
             feeETH: fee
+        });
+        const tickets = await this.retrieveDataOfUser();
+        this.setState({
+            commonTickets: tickets.data.commonTickets,
+            rareTickets: tickets.data.rareTickets,
+            veryRareTickets: tickets.data.veryRareTickets
         })
-        ;
+    }
+
+    retrieveDataOfUser = async () => {
+        let provider = new ethers.providers.Web3Provider(window.ethereum);
+        let signer = provider.getSigner();
+        let address = await signer.getAddress();
+        let tickets = await axios.get(`https://us-central1-dangermonsters.cloudfunctions.net/api/playerStats?address=${address.toLowerCase()}`);
+        return tickets;
     }
 
     connectToSmartContract = async () => {
@@ -74,9 +91,108 @@ export default class NFTCard extends React.Component {
         };
     }
 
+    generateRandomURIGivenRarity = (rarity) => {
+        let uri = '';
+        let idsForCommonCards = [4, 1];
+        let idsForRareCards = [3];
+        let idsForVeryRareCards = [0, 2, 5];
+        let idForCard = 0;
+        if (rarity === 'veryRare') {
+            let randomId = Math.floor(Math.random() * idsForVeryRareCards.length);
+            uri = this.randomUri(idsForVeryRareCards[randomId]);
+            idForCard = idsForVeryRareCards[randomId];
+            //rashes
+            //path of gold
+            //wrath
+        } else if (rarity === 'rare') {
+            //vampire
+            let randomId = Math.floor(Math.random() * idsForRareCards.length);
+            uri = this.randomUri(idsForRareCards[randomId]);
+            idForCard = idsForRareCards[randomId];
+        } else {
+            //midnight hunt
+            //sharpening
+            let randomId = Math.floor(Math.random() * idsForCommonCards.length);
+            uri = this.randomUri(idsForCommonCards[randomId]);
+            idForCard = idsForCommonCards[randomId];
+        }
+        return {
+            uri: uri,
+            id: idForCard
+        };
+    }
+
+    retrieveMessageSignedByOwner = async () => {
+        let messageSignedAndSignature = await axios.post('https://us-central1-dangermonsters.cloudfunctions.net/api/signMintOfTokens', {
+            tokens: '0'
+        });
+        return {
+            signedMessage: messageSignedAndSignature.data['signedMessage']['message'],
+            signature: messageSignedAndSignature.data['signedMessage']['signature']
+        }
+    }
+
+    handleMintWithTicket = async (rarity) => {
+        if (typeof window.ethereum !== undefined) {
+            let blockchain = await this.connectToSmartContract();
+            let provider = new ethers.providers.Web3Provider(window.ethereum);
+            let signer = provider.getSigner();
+            const accounts = await provider.send("eth_requestAccounts", []);
+            if (rarity === 'common') {
+                this.setState({
+                    commonTickets: this.state.commonTickets - 1
+                })
+            } else if (rarity === 'rare') {
+                this.setState({
+                    rareTickets: this.state.rareTickets - 1
+                })
+            } else {
+                this.setState({
+                    veryRareTickets: this.state.veryRareTickets - 1
+                })
+            }
+            const uri = this.generateRandomURIGivenRarity(rarity);
+            let card = {
+                id: uri.id,
+                name: this.nameOfCard(uri.id),
+                uri: uri.uri
+            }
+            this.setState({
+                cardMinted: card
+            })
+            let signedMessageAndSignature = await this.retrieveMessageSignedByOwner();
+            let trx = await blockchain.contract.safeMintWithTicket(
+                signedMessageAndSignature.signedMessage,
+                signedMessageAndSignature.signature,
+                accounts[0],
+                card.uri
+            );
+            this.setState({
+                processingIndexing: true
+            })
+            let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+            card.hash = receipt.transactionHash
+            let img = this.getImgFromName(card.name);
+            this.setState({
+                processingEnded: true,
+                srcOfImgToDisplay: img
+            })
+            $("#alert-mint-process-success").show();
+            this.setState({
+                messageAlert: 'Purchase successful'
+            })
+            this.hideAlertOfSuccess();
+            await this.removeTicket(accounts[0], rarity);
+        }
+    }
+
+    removeTicket = async (address,rarity) => {
+        await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/removeTicket?address=${address.toLowerCase()}&rarity=${rarity}`);
+    }
+
     handleMintWithPromethium = async () => {
         if (typeof window.ethereum !== undefined) {
-            
+
             let blockchain = await this.connectToSmartContract();
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let signer = provider.getSigner();
@@ -90,7 +206,7 @@ export default class NFTCard extends React.Component {
             this.setState({
                 cardMinted: card
             })
-            if(await this.userHasEnoughPromethium(blockchain, 10)) {
+            if (await this.userHasEnoughPromethium(blockchain, 10)) {
                 let trx = await blockchain.contract.safeMintWithTokens(`${blockchain.address}`, `${uri.uri}`);
                 this.setState({
                     processingIndexing: true
@@ -101,7 +217,7 @@ export default class NFTCard extends React.Component {
                 this.setState({
                     processingEnded: true,
                     srcOfImgToDisplay: img
-                })    
+                })
                 $("#alert-mint-process-success").show();
                 this.setState({
                     messageAlert: 'Purchase successful'
@@ -114,7 +230,7 @@ export default class NFTCard extends React.Component {
                 })
                 this.hideAlertError();
             }
-            
+
         }
     }
 
@@ -313,6 +429,7 @@ export default class NFTCard extends React.Component {
                                     <button className={'personal-button-mint-promethium'} onClick={this.handleMintWithPromethium}>
                                         10 promethiums
                                     </button>
+
                                 </Typography>
                             ) : (
                                 !this.state.processingEnded ? (
@@ -332,10 +449,18 @@ export default class NFTCard extends React.Component {
                                 )
                             )
                         }
-                        <Typography variant="body2" color="text.secondary">
-                        </Typography>
+
                     </CardContent>
                 </Card>
+                <h1>Or use a ticket</h1>
+                <p>
+                    Common tickets remaining: {this.state.commonTickets}<br />
+                    Rare tickets remaining: {this.state.rareTickets}<br />
+                    Very rare tickets remaining: {this.state.veryRareTickets}<br />
+                </p>
+                <button className={'personal-button-mint-ticket'} onClick={() => this.handleMintWithTicket('common')}>1 common ticket</button>
+                <button className={'personal-button-mint-ticket'} onClick={() => this.handleMintWithTicket('rare')}>1 rare ticket</button>
+                <button className={'personal-button-mint-ticket'} onClick={() => this.handleMintWithTicket('veryRare')} style={{ marginBottom: '20px' }}>1 very rare ticket</button>
             </>
         );
     }
