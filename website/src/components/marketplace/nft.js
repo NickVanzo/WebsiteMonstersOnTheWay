@@ -57,19 +57,24 @@ export class NFTMarketPlace extends React.Component {
         return info.data;
     }
 
-    checkOwnershipForEachNFT = async (totalSupply, contract) => {
+    checkOwnershipForEachNFT = async (contract) => {
+        let totalSupply = await contract.lastIdMinted();
+        
         for (let i = 0; i < totalSupply; i++) {
-            let owner = await contract.ownerOf(i);
-            if (owner.toLowerCase() === this.state.address) {
-                let cardInfo = await this.checkDurationForNFT(i);
-                let uriOfJson = await this.fetchUriFromId(i);
-                let cardData = await this.fetchDataForCard(uriOfJson);
-                cardInfo.id = i;
-                cardInfo.effects = cardData
-                cardInfo.imageUrl = `https://ipfs.io/ipfs/${cardData["image"].slice(7, cardData["image"].length)}`;
-                this.setState({
-                    idOfNFTsOwned: this.state.idOfNFTsOwned.concat(cardInfo)
-                })
+            let theTokenExists = await contract.checkIfTokenExists(i);        
+            if (theTokenExists) {
+                let owner = await contract.ownerOf(i);
+                if (owner.toLowerCase() === this.state.address) {
+                    let cardInfo = await this.checkDurationForNFT(i);
+                    let uriOfJson = await this.fetchUriFromId(i);
+                    let cardData = await this.fetchDataForCard(uriOfJson);
+                    cardInfo.id = i;
+                    cardInfo.effects = cardData
+                    cardInfo.imageUrl = `https://ipfs.io/ipfs/${cardData["image"].slice(7, cardData["image"].length)}`;
+                    this.setState({
+                        idOfNFTsOwned: this.state.idOfNFTsOwned.concat(cardInfo)
+                    })
+                }
             }
         }
     }
@@ -92,12 +97,12 @@ export class NFTMarketPlace extends React.Component {
         this.setState({
             address: addressToSet
         })
+
         let provider = new ethers.providers.Web3Provider(window.ethereum);
         let signer = provider.getSigner();
         let contract = new ethers.Contract(constants.contractNFTAddress, constants.contractNFTABI, signer);
 
-        let trx = await contract.getCids();
-        await this.checkOwnershipForEachNFT(trx.length, contract);
+        await this.checkOwnershipForEachNFT(contract);
     }
 
     render() {
@@ -126,7 +131,7 @@ export class NFTMarketPlace extends React.Component {
                                 }
                             </>
                         ) : <>
-                            <MintNFT/>
+                            <MintNFT />
                         </>
                     }
 

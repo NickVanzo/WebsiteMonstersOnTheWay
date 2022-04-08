@@ -25,7 +25,7 @@ export class DisplayNumberOfTicketsOfUser extends React.Component {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
         let signer = provider.getSigner();
         let address = await signer.getAddress();
-        let tickets = await axios.get(`http://localhost:5001/dangermonsters/us-central1/api/playerStats?address=${address.toLowerCase()}`);
+        let tickets = await axios.get(`https://us-central1-dangermonsters.cloudfunctions.net/api/playerStats?address=${address.toLowerCase()}`);
         return tickets;
     }
 

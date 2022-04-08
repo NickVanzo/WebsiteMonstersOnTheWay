@@ -73,7 +73,7 @@ export default class NFTCard extends React.Component {
 
     changeImageOverTime = () => {
         let i = 1;
-        const numberOfCards = 7;
+        const numberOfCards = 8;
         setInterval(() => {
             if (!this.state.processingEnded) {
                 this.loadNextImage((this.state.imgToDisplay % numberOfCards) + 1);
@@ -93,7 +93,7 @@ export default class NFTCard extends React.Component {
 
     generateRandomURIGivenRarity = (rarity) => {
         let uri = '';
-        let idsForCommonCards = [4, 1];
+        let idsForCommonCards = [4, 1, 6];
         let idsForRareCards = [3];
         let idsForVeryRareCards = [0, 2, 5];
         let idForCard = 0;
@@ -112,6 +112,7 @@ export default class NFTCard extends React.Component {
         } else {
             //midnight hunt
             //sharpening
+            //immersion
             let randomId = Math.floor(Math.random() * idsForCommonCards.length);
             uri = this.randomUri(idsForCommonCards[randomId]);
             idForCard = idsForCommonCards[randomId];
@@ -171,6 +172,7 @@ export default class NFTCard extends React.Component {
                 processingIndexing: true
             })
             let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+            await this.addNftInDB();
             card.hash = receipt.transactionHash
             let img = this.getImgFromName(card.name);
             this.setState({
@@ -186,7 +188,7 @@ export default class NFTCard extends React.Component {
         }
     }
 
-    removeTicket = async (address,rarity) => {
+    removeTicket = async (address, rarity) => {
         await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/removeTicket?address=${address.toLowerCase()}&rarity=${rarity}`);
     }
 
@@ -218,6 +220,7 @@ export default class NFTCard extends React.Component {
                     processingEnded: true,
                     srcOfImgToDisplay: img
                 })
+                await this.addNftInDB();
                 $("#alert-mint-process-success").show();
                 this.setState({
                     messageAlert: 'Purchase successful'
@@ -230,8 +233,13 @@ export default class NFTCard extends React.Component {
                 })
                 this.hideAlertError();
             }
-
         }
+    }
+
+    addNftInDB = async () => {
+        const blockchain = await this.connectToSmartContract();
+        const id = await blockchain.contract.lastIdMinted();
+        await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/addNft?id=${id-1}&uri=${this.state.cardMinted.uri}`);
     }
 
     handleMintWithETH = async () => {
@@ -259,6 +267,7 @@ export default class NFTCard extends React.Component {
                     processingIndexing: true
                 })
                 let receipt = await blockchain.provider.waitForTransaction(trx.hash);
+                await this.addNftInDB();
 
                 card.hash = receipt.transactionHash
                 let img = this.getImgFromName(card.name);
@@ -329,6 +338,8 @@ export default class NFTCard extends React.Component {
             return "Sharpening"
         } else if (id === 5) {
             return "Path of gold"
+        } else if (id === 6) {
+            return "Immersion";
         }
     }
 
@@ -336,7 +347,6 @@ export default class NFTCard extends React.Component {
         let provider = new ethers.providers.Web3Provider(window.ethereum);
         let contract = new ethers.Contract(constants.contractNFTAddress, constants.contractNFTABI, provider);
         const feeBN = await contract.getFee();
-        console.log(feeBN);
         return ethers.utils.formatEther(feeBN._hex).toString();
     }
 
@@ -360,6 +370,9 @@ export default class NFTCard extends React.Component {
                 break;
             case 5:
                 uri = 'QmP4dt9ByjwDqwCvx2goTUCcFuU9u7DhhyfhnPb6mtGWa2';
+                break;
+            case 6:
+                uri = 'QmQdPSCBZbrcfQBh196amZif3P29vK7L18kwXe5jx1uPnE';
                 break;
             default:
                 console.error('There are not uris for this id');
@@ -388,6 +401,9 @@ export default class NFTCard extends React.Component {
                 break;
             case "Sharpening":
                 img = "/images/4.jpeg";
+                break;
+            case "Immersion":
+                img = "/images/8.jpeg";
                 break;
             default:
                 console.error("There is not image for this id");

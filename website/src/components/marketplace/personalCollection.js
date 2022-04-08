@@ -13,6 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Slide } from '@mui/material';
 import { Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material';
 import { CircularProgress } from '@mui/material';
+import { constants } from '../../constants';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -51,7 +52,6 @@ export class InteractiveList extends React.Component {
     }
 
     generate(array) {
-        console.log(array);
         return array.map((value) =>
             <ListItem>
                 <ListItemAvatar>
@@ -108,17 +108,17 @@ export class InteractiveList extends React.Component {
             return <p>Name: Sharpening</p>
         } else if (id === 5) {
             return <p>Name: Path of gold</p>
+        } else if (id === 6) {
+            return <p>Name: Immersion</p>
         }
     }
 
     getRarity = (id) => {
-        if (id === 0) {
-            return <p>Legendary</p>
-        } else if (id === 1 || id === 4) {
+        if (id === 1 || id === 4) {
             return <p>Common</p>
-        } else if (id === 2 || id === 5) {
+        } else if (id === 2 || id === 5 || id === 0) {
             return <p>Very rare</p>
-        } else if (id === 3 || id === 3) {
+        } else if (id === 3 || id === 6) {
             return <p>Rare</p>
         }
     }
@@ -182,7 +182,7 @@ export class InteractiveList extends React.Component {
                                         }>
                                             <Grid item xs={1}></Grid>
                                             <Grid item xs={4}>
-                                                <button className='personal-button-opensea' onClick={() => window.open(`https://testnets.opensea.io/assets/0xe961e3d71cb5db261544957efd2d3286de9305e2/${this.state.cardInfo.id}`, "_blank")}>View in Opensea</button>
+                                                <button className='personal-button-opensea' onClick={() => window.open(`https://testnets.opensea.io/assets/${constants.contractNFTAddress}/${this.state.cardInfo.id}`, "_blank")}>View in Opensea</button>
                                             </Grid>
                                             <Grid item xs={2}></Grid>
                                             <Grid item xs={4}>
