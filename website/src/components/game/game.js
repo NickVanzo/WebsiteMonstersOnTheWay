@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Grid } from "@mui/material";
 import Alert from '@mui/material/Alert';
 import $ from "jquery";
+import { AccordionList } from "./accordionList";
 
 export class Game extends React.Component {
 
@@ -40,6 +41,7 @@ export class Game extends React.Component {
                     <Grid item xs={1} />
                     <Grid item xs={10}>
                         <h1>Play "Monsters on the way" to earn Crypto and NFTs</h1>
+                        <AccordionList/>
                         <h2>This is the project for my thesis</h2>
                         <p>
                             Slay monsters and loot treasure to gain Crypto, NFTs and in game gold!<br />
@@ -56,9 +58,6 @@ export class Game extends React.Component {
                     <Grid item xs={1} />
                 </Grid>
             </>
-
-
         )
     }
-
 }
