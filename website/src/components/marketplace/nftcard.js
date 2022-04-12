@@ -42,6 +42,7 @@ export default class NFTCard extends React.Component {
             rareTickets: tickets.data.rareTickets,
             veryRareTickets: tickets.data.veryRareTickets
         })
+
     }
 
     retrieveDataOfUser = async () => {
@@ -239,7 +240,8 @@ export default class NFTCard extends React.Component {
     addNftInDB = async () => {
         const blockchain = await this.connectToSmartContract();
         const id = await blockchain.contract.lastIdMinted();
-        await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/addNft?id=${id-1}&uri=${this.state.cardMinted.uri}`);
+        console.log(parseInt(ethers.utils.formatUnits(id[0]._hex, 0)) - 1);
+        await axios.post(`https://us-central1-dangermonsters.cloudfunctions.net/api/addNft?id=${parseInt(ethers.utils.formatUnits(id[0]._hex, 0)) - 1}&uri=${this.state.cardMinted.uri}`);
     }
 
     handleMintWithETH = async () => {
