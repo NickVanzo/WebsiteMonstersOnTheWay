@@ -11,6 +11,19 @@
     cursor: pointer;
 }
 
+
+.console-button {
+    padding-top: 15px;
+    margin-bottom: 10%;
+    width: 40%;
+    font-family: "Personal Chicago";
+    text-align: center;
+    cursor: pointer;
+    border: black;
+    border-style: solid; 
+    border-radius: 10px;
+}
+
 .personal-button {
     width: 100px;
     height: 50px;
@@ -21,7 +34,7 @@
     border-style: solid;    
 }
 
-.personal-button:hover, .personal-button-deny:hover {
+.personal-button:hover, .personal-button-deny:hover, .console-button:hover {
     background-color: red;
     color: white;
 }

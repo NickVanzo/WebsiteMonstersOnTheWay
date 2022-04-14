@@ -8,6 +8,14 @@ h1, h2, p {
     font-family: "Personal Chicago"                                             
 }
 
+#title-game-page {
+    font-size: 2em;
+}
+
+.text-in-slider {
+    font-size: 150%;
+}
+
 .text-personal {
     font-family: "Personal Chicago"                                             
 }

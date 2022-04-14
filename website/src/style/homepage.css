@@ -1,9 +1,20 @@
 .home-page-container {    
-    top: 3em;
+    top: 4em;
     position: relative;
     text-align: center;
 }
 
 body {
-    background-color: #e2ba36;
+    background-color: #F3A712;
+}
+
+.slider {
+    margin-top: 6%;
+    margin-bottom: 6%;
+}
+
+@media screen and (max-width: 400px) {
+    .home-page-container {
+        top: 4em
+    }   
 }
