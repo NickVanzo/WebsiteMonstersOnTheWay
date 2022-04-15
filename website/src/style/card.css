@@ -1,14 +1,17 @@
 .card {
-    left: 38%;
     position: relative;
     width: 100%;
     margin-bottom: 10em;
     max-width: 345px;
     max-height: 700px;
+    border-color: violet;
+    margin: 30px;
 }
 
 @media screen and (min-width: 0px) and (max-width: 400px) {
     .card {
+        margin: 0;
+        margin-bottom: 10px;
         left: 0%;
     }
 }

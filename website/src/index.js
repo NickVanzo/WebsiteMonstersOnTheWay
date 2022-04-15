@@ -18,10 +18,13 @@ import './style/nftContainer.css';
 import './style/card.css';
 import './style/accordions.css';
 import './style/images.css';
+import './style/shop.css';
+
 
 import { App } from './app';
-import { NFTMarketPlace } from './components/marketplace/nft';
+import { NFTMarketPlace, PersonalCollection } from './components/marketplace/collection';
 import { TokenMarketPlace } from './components/marketplace/token';
+import { Shop } from './components/marketplace/shop';
 
 
 ReactDOM.render(
@@ -29,8 +32,9 @@ ReactDOM.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
-        <Route path="/marketplaceNFT" element={<NFTMarketPlace />} />
+        <Route path="/shop" element={<Shop />} />
         <Route path="/marketplaceToken" element={<TokenMarketPlace />} />
+        <Route path="/profile/collection" element={<PersonalCollection/>}/>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

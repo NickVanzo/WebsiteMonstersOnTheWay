@@ -30,10 +30,9 @@ export class MetamaskButton extends React.Component {
                     id={"metamask-button"}
                     onClick={async () => await this.connectMetamask()}
                 >
-                    <img src="./images/metamask-fox.svg" />
+                    <img src="/images/metamask-fox.svg" />
                 </Button>
             </Tooltip >
-
         )
     }
 }

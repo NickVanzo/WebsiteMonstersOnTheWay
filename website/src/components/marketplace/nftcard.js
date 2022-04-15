@@ -5,10 +5,11 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { BigNumber, ethers } from 'ethers';
 import { constants } from '../../constants';
-import { Alert, CircularProgress } from '@mui/material';
+import { Alert, CircularProgress, Grid } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import $ from "jquery";
 import axios from 'axios';
+import { Button, CardActions } from '@material-ui/core';
 
 export default class NFTCard extends React.Component {
     constructor(props) {
@@ -18,6 +19,8 @@ export default class NFTCard extends React.Component {
             srcOfImgToDisplay: '/images/1.jpeg',
             feeETH: 0,
             processingIndexing: false,
+            processingTicketPayment: false,
+            processingForTicketEnded: false,
             processingEnded: false,
             cardMinted: {},
             messageAlert: "",
@@ -170,14 +173,14 @@ export default class NFTCard extends React.Component {
                 card.uri
             );
             this.setState({
-                processingIndexing: true
+                processingTicketPayment: true
             })
             let receipt = await blockchain.provider.waitForTransaction(trx.hash);
             await this.addNftInDB();
             card.hash = receipt.transactionHash
             let img = this.getImgFromName(card.name);
             this.setState({
-                processingEnded: true,
+                processingForTicketEnded: true,
                 srcOfImgToDisplay: img
             })
             $("#alert-mint-process-success").show();
@@ -417,7 +420,9 @@ export default class NFTCard extends React.Component {
     handleDoneButton = () => {
         this.setState({
             processingIndexing: false,
-            processingEnded: false
+            processingEnded: false,
+            processingForTicketEnded: false,
+            processingTicketPayment: false,
         })
     }
 
@@ -430,55 +435,163 @@ export default class NFTCard extends React.Component {
                 <Alert variant="filled" severity="error" id="alert-mint-process-fail" style={{ zIndex: 2, position: "fixed", top: "10px" }}>
                     {this.state.messageAlert}
                 </Alert>
-                <Card className='card ' sx={{ borderRadius: "30px", backgroundColor: "#000000" }} >
-                    <CardMedia
-                        component="img"
-                        height="280"
-                        image={this.state.srcOfImgToDisplay}
-                        alt="Random image of NFT"
-                    />
-                    <CardContent>
-                        {
-                            !this.state.processingIndexing ? (
-                                <Typography gutterBottom variant="h5" component="div">
-                                    <button className={'personal-button-mint-eth'} onClick={this.handleMintWithETH}>
-                                        {this.state.feeETH} ETH
-                                    </button>
-                                    <button className={'personal-button-mint-promethium'} onClick={this.handleMintWithPromethium}>
-                                        10 promethiums
-                                    </button>
-
-                                </Typography>
-                            ) : (
-                                !this.state.processingEnded ? (
-                                    <>
-                                        <p style={{ color: "white" }}>Processing...
-                                        </p>
-                                        <CircularProgress />
-                                    </>
-                                ) : (
-                                    <>
-                                        <p style={{ color: "white" }}>
-                                            {this.state.cardMinted.name} added to your collection!
-                                        </p>
-                                        <CheckIcon style={{ color: "green" }} />
-                                        <button className='personal-button-accept' onClick={this.handleDoneButton}>Done</button>
-                                    </>
-                                )
-                            )
-                        }
-
-                    </CardContent>
-                </Card>
-                <h1>Or use a ticket</h1>
                 <p>
                     Common tickets remaining: {this.state.commonTickets}<br />
                     Rare tickets remaining: {this.state.rareTickets}<br />
                     Very rare tickets remaining: {this.state.veryRareTickets}<br />
                 </p>
-                <button className={'personal-button-mint-ticket'} onClick={() => this.handleMintWithTicket('common')}>1 common ticket</button>
-                <button className={'personal-button-mint-ticket'} onClick={() => this.handleMintWithTicket('rare')}>1 rare ticket</button>
-                <button className={'personal-button-mint-ticket'} onClick={() => this.handleMintWithTicket('veryRare')} style={{ marginBottom: '20px' }}>1 very rare ticket</button>
+                <Grid container style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                    <Grid item sx={6}>
+                        <Card className={'card'} sx={{ maxWidth: 345 }}>
+                            {
+                                !this.state.processingIndexing && !this.state.processingEnded ? (
+                                    <CardMedia
+                                        component="img"
+                                        height="200"
+                                        image="/images/treasure.jpeg"
+                                        alt="shop with tokens"
+                                    />
+                                ) : (
+                                    <CardMedia
+                                        component="img"
+                                        height="200"
+                                        image={this.state.srcOfImgToDisplay}
+                                        alt="shop with tokens"
+                                    />
+                                )
+                            }
+
+                            <CardContent>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    <p>Use your tokens</p>
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Use your promethiums or your ETHs to mint a card
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Grid container>
+                                    {
+                                        !this.state.processingIndexing ? (
+                                            <>
+                                                <Grid item xs={6}>
+                                                    <Button onClick={this.handleMintWithPromethium} size="small" style={{ fontFamily: "Personal Chicago", width: "100%" }}>100 Promethiums</Button>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <Button onClick={this.handleMintWithETH} size="small" style={{ fontFamily: "Personal Chicago", width: "100%" }}>{this.state.feeETH} ETH</Button>
+                                                </Grid>
+                                            </>
+
+                                        ) : (
+                                            !this.state.processingEnded ? (
+                                                <>
+                                                    <Grid item xs={12}>
+                                                        <p style={{ color: "black" }}>Processing...</p>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <CircularProgress />
+                                                    </Grid>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Grid item xs={12}>
+                                                        <p style={{ color: "black" }}>
+                                                            {this.state.cardMinted.name} added to your collection!
+                                                        </p>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <CheckIcon style={{ color: "green" }} />
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <button className='personal-button-accept' onClick={this.handleDoneButton}>Done</button>
+
+                                                    </Grid>
+                                                </>
+                                            )
+                                        )
+                                    }
+                                </Grid>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                    <Grid item sx={6}>
+                        <Card className={'card'} sx={{ maxWidth: 345 }}>
+                            {
+                                !this.state.processingTicketPayment && !this.state.processingForTicketEnded ? (
+                                    <CardMedia
+                                        component="img"
+                                        height="200"
+                                        image="/images/water.jpeg"
+                                        alt="shop with tokens"
+                                    />
+                                ) : (
+                                    <CardMedia
+                                        component="img"
+                                        height="200"
+                                        image={this.state.srcOfImgToDisplay}
+                                        alt="shop with tokens"
+                                    />
+                                )
+                            }
+                            <CardContent>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    <p>Use your tickets</p>
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Use the tickets you found while looting to unlock new powerful abilities
+                                </Typography>
+                            </CardContent>
+                            <CardActions>
+                                <Grid container>
+                                    {
+                                        !this.state.processingTicketPayment ? (
+                                            <>
+                                                <Grid item xs={4}>
+                                                    <Button size="small" onClick={() => this.handleMintWithTicket('common')} style={{ fontFamily: "Personal Chicago", width: "100%" }}>Common</Button>
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <Button size="small" onClick={() => this.handleMintWithTicket('rare')} style={{ fontFamily: "Personal Chicago", width: "100%" }}>Rare</Button>
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <Button size="small" onClick={() => this.handleMintWithTicket('veryRare')} style={{ fontFamily: "Personal Chicago", width: "100%" }}>Very rare</Button>
+                                                </Grid>
+                                            </>
+
+                                        ) : (
+                                            !this.state.processingForTicketEnded ? (
+                                                <>
+                                                    <Grid item xs={12}>
+                                                        <p style={{ color: "black" }}>Processing...</p>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <CircularProgress />
+                                                    </Grid>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Grid item xs={12}>
+                                                        <p style={{ color: "black" }}>
+                                                            {this.state.cardMinted.name} added to your collection!
+                                                        </p>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <CheckIcon style={{ color: "green" }} />
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <button className='personal-button-accept' onClick={this.handleDoneButton}>Done</button>
+
+                                                    </Grid>
+                                                </>
+                                            )
+                                        )
+                                    }
+                                </Grid>
+
+
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                </Grid>
             </>
         );
     }

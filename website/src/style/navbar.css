@@ -1,10 +1,11 @@
 .navbar {
     background-color: #AF4319;
-    height: 7%;
     position: fixed;
     width: 100%;
     left: 0%;
     top: 0%;
     min-width: 300px;    
     z-index: 1;
+    font-family: "Personal Chicago";
 }
+

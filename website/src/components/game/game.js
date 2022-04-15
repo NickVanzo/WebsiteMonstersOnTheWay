@@ -18,6 +18,10 @@ export class Game extends React.Component {
         $("#alert-game").hide();
     }
 
+    openItch = () => {
+        window.open('https://allennick.itch.io/monsters-on-the-way', '_blank');
+    }
+
     showAlert = () => {
         $("#alert-game").show()
         this.setState({
@@ -48,9 +52,9 @@ export class Game extends React.Component {
                             Use your gold or your tokens to buy NFTs directly from the market<br />
                             That's all you need to understand, HAVE FUN!
                         </p>
-                        <button variant="contained" className="console-button hide-in-small-screen">
+                        <button variant="contained" onClick={this.openItch} className="console-button hide-in-small-screen">
                             <img src="images/console.svg" className="console"></img>
-                            <a href="https://allennick.itch.io/monsters-on-the-way"><p>Play NOW!</p></a>
+                            <p>Play NOW!</p>
                         </button>
                         
                         <button onClick={this.showAlert} variant="contained" className="personal-button hide-in-big-screen">
