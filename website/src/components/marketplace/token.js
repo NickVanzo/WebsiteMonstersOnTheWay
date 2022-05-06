@@ -97,7 +97,7 @@ export class TokenMarketPlace extends React.Component {
         if (typeof window.ethereum !== undefined) {
             let provider = new ethers.providers.Web3Provider(window.ethereum);
             let signer = provider.getSigner();
-            const accounts = await provider.send("eth_requestAccounts", []);
+            let accounts = await provider.send("eth_requestAccounts", []);
             this.setState({
                 address: accounts[0]
             })

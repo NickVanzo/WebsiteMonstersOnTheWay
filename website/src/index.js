@@ -20,7 +20,6 @@ import './style/accordions.css';
 import './style/images.css';
 import './style/shop.css';
 
-
 import { App } from './app';
 import { NFTMarketPlace, PersonalCollection } from './components/marketplace/collection';
 import { TokenMarketPlace } from './components/marketplace/token';

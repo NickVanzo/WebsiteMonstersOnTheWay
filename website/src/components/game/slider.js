@@ -1,4 +1,4 @@
-import { Container, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 import * as React from 'react';
 import Slider from "react-slick";
 
@@ -23,30 +23,30 @@ export class HomeSlider extends React.Component {
             <div>
                 <Slider className='slider' {...settings}>
                     <p className='text-in-slider'>
-                        Play to earn the in-game currency: the Promethium
+                        Play to earn the in-game currency: <br></br>The Promethium
                         <Grid container>
                             <Grid item xs={4}></Grid>
-                            <Grid item xs={4} style={{justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                            <Grid item xs={4} style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                                 <img src='/images/diamond.svg' className='diamond'></img>
                             </Grid>
                             <Grid item xs={4}></Grid>
                         </Grid>
                     </p>
-                    <p>
-                        Find the tickets to mint new NFTs directly from our marketplace 
+                    <p className='text-in-slider'>
+                        Find the tickets to mint new NFTs directly from our marketplace
                         <Grid container>
                             <Grid item xs={4}></Grid>
-                            <Grid item xs={4} style={{justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
-                                <img src='/images/store.svg' className='store  '></img>
+                            <Grid item xs={4} style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
+                                <img src='/images/store.svg' className='store '></img>
                             </Grid>
                             <Grid item xs={4}></Grid>
                         </Grid>
                     </p>
-                    <p>
+                    <p className='text-in-slider'>
                         Use the cards in your collection to acquire powerfull skills
                         <Grid container>
                             <Grid item xs={4}></Grid>
-                            <Grid item xs={4} style={{justifyContent: 'center', alignItems: 'center', display: 'flex'}}>
+                            <Grid item xs={4} style={{ justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                                 <img src='/images/axe.svg' className='axe'></img>
                             </Grid>
                             <Grid item xs={4}></Grid>

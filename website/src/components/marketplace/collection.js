@@ -7,7 +7,6 @@ import { InteractiveList } from './listOfOwnedNFTs';
 import { Container } from 'react-bootstrap';
 import axios from 'axios';
 import { create } from "ipfs";
-import { MintNFT } from './mintPage';
 
 export class PersonalCollection extends React.Component {
     constructor(props) {
@@ -107,7 +106,7 @@ export class PersonalCollection extends React.Component {
     render() {
         return (
             <>
-                <HomeNavbar tabSelected={1} />
+                <HomeNavbar />
                 <Container className={'nft-page-container'}>
                     <h1>Connect Metamask to see your NFTs</h1>
                     {

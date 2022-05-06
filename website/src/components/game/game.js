@@ -48,9 +48,9 @@ export class Game extends React.Component {
                         {/* <AccordionList/> */}
                         <HomeSlider/>
                         <p>
-                            Slay monsters and loot treasure to gain Crypto, NFTs and in game gold!<br />
-                            Use your gold or your tokens to buy NFTs directly from the market<br />
-                            That's all you need to understand, HAVE FUN!
+                            Slay monsters and loot treasure!<br />
+                            Buy NFTs directly from the market<br />
+                            That's all you need, HAVE FUN!
                         </p>
                         <button variant="contained" onClick={this.openItch} className="console-button hide-in-small-screen">
                             <img src="images/console.svg" className="console"></img>

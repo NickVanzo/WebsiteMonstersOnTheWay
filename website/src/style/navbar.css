@@ -1,5 +1,6 @@
 .navbar {
-    background-color: #AF4319;
+    background-color: #FC8621;
+    border-bottom: 3px solid black;
     position: fixed;
     width: 100%;
     left: 0%;
@@ -9,3 +10,12 @@
     font-family: "Personal Chicago";
 }
 
+.navbar-image {
+    max-width: 40px;
+    padding-right: 10px;
+}
+
+.navbar-item {
+    padding-left: 20px;
+    padding-right: 30px;
+}
